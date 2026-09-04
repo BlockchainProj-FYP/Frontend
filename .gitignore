@@ -1,0 +1,6 @@
+btq-core/
+node_modules/
+dist/
+.env
+rpc-history.jsonl
+*.log
