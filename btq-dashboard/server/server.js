@@ -7,14 +7,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.use(express.json());
 
-const RPC_URL = 'http://127.0.0.1:18443';
-const RPC_USER = process.env.RPC_USER || 'btquser';
-const RPC_PASS = process.env.RPC_PASS || 'btqpass123';
+const RPC_URL = process.env.RPC_URL || 'http://127.0.0.1:18443';
+const RPC_USER = process.env.RPC_USER;
+const RPC_PASS = process.env.RPC_PASS;
+if (!RPC_USER || !RPC_PASS) throw new Error('RPC_USER and RPC_PASS must be set');
 const HISTORY_FILE = path.join(__dirname, 'rpc-history.jsonl');
 const CACHE_DEPTH = 300; // how many recent blocks to keep in memory
 
 async function rpcCall(method, params = [], wallet = null) {
-  const url = wallet ? `${RPC_URL}/wallet/${wallet}` : RPC_URL;
+  const url = wallet ? `${RPC_URL}/wallet/${encodeURIComponent(wallet)}` : RPC_URL;
   const auth = Buffer.from(`${RPC_USER}:${RPC_PASS}`).toString('base64');
   const res = await fetch(url, {
     method: 'POST',
@@ -105,4 +106,4 @@ app.get('/api/history', (req, res) => {
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
 app.get('/*splat', (req, res) => res.sendFile(path.join(__dirname, '../frontend/dist/index.html')));
 
-app.listen(4000, '0.0.0.0', () => console.log('BTQ admin dashboard on :4000'));
+app.listen(Number(process.env.PORT || 4000), process.env.HOST || '127.0.0.1', () => console.log('BTQ admin dashboard listening locally'));
