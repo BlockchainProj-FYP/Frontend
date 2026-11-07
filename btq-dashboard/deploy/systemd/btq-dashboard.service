@@ -1,0 +1,20 @@
+[Unit]
+Description=BTQ dashboard local RPC proxy
+Wants=network-online.target btqd.service
+After=network-online.target btqd.service
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/home/ubuntu/Frontend/btq-dashboard/server
+ExecStartPre=/usr/bin/test -f /home/ubuntu/Frontend/btq-dashboard/server/.env
+ExecStartPre=/usr/bin/test -f /home/ubuntu/Frontend/btq-dashboard/frontend/dist/index.html
+ExecStart=/home/ubuntu/.local/opt/node-current/bin/node --env-file=.env server.js
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
